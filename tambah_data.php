@@ -1,4 +1,15 @@
 <?php
+session_start();
+if (!isset($_SESSION["user_id"])) {
+    if (isset($_COOKIE["ingat_user"])) {
+        $_SESSION["user_id"] = $_COOKIE["ingat_user"];
+        $_SESSION["username"] = $_COOKIE["ingat_nama"];
+    } else {
+        header("Location: login.php");
+        exit();
+    }
+}
+
 include 'koneksi.php';
 
 $pesan_error = "";
@@ -58,7 +69,7 @@ if (isset($_POST['simpan'])) {
         <div class="page-header">
             <h2>Tambah Data Barang Baru</h2>
             <div class="header-buttons">
-                <a href="index.html" class="btn-secondary">⬅ Batal & Kembali</a>
+                <a href="index.php" class="btn-secondary">⬅ Batal & Kembali</a>
             </div>
         </div>
 

@@ -1,9 +1,25 @@
+<?php
+session_start();
+if (!isset($_SESSION["user_id"])) {
+    if (isset($_COOKIE["ingat_user"])) {
+        $_SESSION["user_id"] = $_COOKIE["ingat_user"];
+        $_SESSION["username"] = $_COOKIE["ingat_nama"];
+    } else {
+        header("Location: login.php");
+        exit();
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <title>Dashboard </title>
     <link rel="stylesheet" href="style.css">
+    <a href="logout.php" class="btn btn-danger">Logout</a>
+    
+
     
     <style>
         .dash-wrapper {

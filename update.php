@@ -1,4 +1,14 @@
 <?php
+session_start();
+if (!isset($_SESSION["user_id"])) {
+    if (isset($_COOKIE["ingat_user"])) {
+        $_SESSION["user_id"] = $_COOKIE["ingat_user"];
+        $_SESSION["username"] = $_COOKIE["ingat_nama"];
+    } else {
+        header("Location: login.php");
+        exit();
+    }
+}
 include 'koneksi.php';
 
 $pesan_error = "";

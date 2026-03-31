@@ -1,4 +1,15 @@
 <?php
+session_start();
+if (!isset($_SESSION["user_id"])) {
+    if (isset($_COOKIE["ingat_user"])) {
+        $_SESSION["user_id"] = $_COOKIE["ingat_user"];
+        $_SESSION["username"] = $_COOKIE["ingat_nama"];
+    } else {
+        header("Location: login.php");
+        exit();
+    }
+}
+
 include 'koneksi.php';
 ?>
 <!DOCTYPE html>
@@ -14,7 +25,7 @@ include 'koneksi.php';
         <div class="page-header">
             <h2>Daftar Inventaris Warnet Gaming</h2>
             <div class="header-buttons">
-                <a href="index.html" class="btn-secondary">⬅ Kembali</a>
+                <a href="index.php" class="btn-secondary">⬅ Kembali</a>
                 <a href="tambah_data.php" class="btn btn-primary">+ Tambah Data</a>
             </div>
         </div>
