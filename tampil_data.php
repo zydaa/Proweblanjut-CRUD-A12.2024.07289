@@ -55,7 +55,18 @@ include 'koneksi.php';
                     ?>
                     <tr>
                         <td><?= $no++; ?></td>
-                        <td><a href="upload/<?php echo $row['foto']; ?>" target="_blank" style="color: #818cf8;">Lihat Foto</a></td>
+                        
+                        <td style="text-align: center;">
+                            <?php if (!empty($row['thumbpath'])) { ?>
+                                <a href="<?= htmlspecialchars($row['filepath']); ?>" target="_blank" title="Klik untuk lihat ukuran penuh">
+                                    <img src="<?= htmlspecialchars($row['thumbpath']); ?>" alt="Foto" style="max-width: 70px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.2s;">
+                                </a>
+                                <br>
+                                <a href="<?= htmlspecialchars($row['filepath']); ?>" target="_blank" style="font-size: 11px; color: #818cf8; text-decoration: none;">Lihat Asli</a>
+                            <?php } else { ?>
+                                <span style="color: #9ca3af; font-size: 12px;">Kosong</span>
+                            <?php } ?>
+                        </td>
                         <td><?= htmlspecialchars($row['kode_barang']); ?></td>
                         <td><?= htmlspecialchars($row['nama_barang']); ?></td>
                         <td><?= htmlspecialchars($row['kategori']); ?></td>
@@ -72,5 +83,6 @@ include 'koneksi.php';
             </table>
         </div>
 
-    </div> </body>
+    </div> 
+</body>
 </html>

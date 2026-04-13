@@ -23,7 +23,6 @@ if (isset($_POST['simpan'])) {
     $jumlah = (int) $_POST['jumlah'];
     $kondisi = mysqli_real_escape_string($koneksi, trim($_POST['kondisi']));
 
-    
     if (preg_match('/[0-9]/', $nama_barang)) {
         $pesan_error = "Error: Nama barang tidak boleh mengandung angka!";
     } else {
@@ -35,21 +34,49 @@ if (isset($_POST['simpan'])) {
         $ekstensi = strtolower(end($x));
 
         if (in_array($ekstensi, $ext_diizinkan) === true) {
-                $foto_baru = time() . '_' . $nama_foto; 
-                move_uploaded_file($tmp_foto, 'upload/' . $foto_baru);
+            $foto_baru = time() . '_' . $nama_foto; 
+            $target_asli = 'uploads/' . $foto_baru;
+            $target_thumb = 'thumbnails/' . $foto_baru;
 
-                $stmt = $koneksi->prepare("INSERT INTO inventaris (kode_barang, nama_barang, kategori, merk, jumlah, kondisi, foto) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                
-                $stmt->bind_param("ssssiss", $kode_barang, $nama_barang, $kategori, $merk, $jumlah, $kondisi, $foto_baru);
+            move_uploaded_file($tmp_foto, $target_asli);
 
-                if ($stmt->execute()) {
-                    $pesan_sukses = "Data barang berhasil ditambahkan!";
-                } else {
-                    $pesan_error = "Gagal menyimpan data: " . $stmt->error;
-                }
-                $stmt->close();
-            } 
-         else {
+            list($width, $height) = getimagesize($target_asli);
+            $new_width = 150; 
+            $new_height = floor($height * ($new_width / $width)); 
+
+            $thumb = imagecreatetruecolor($new_width, $new_height);
+
+            if ($ekstensi == 'png') {
+                $source_image = imagecreatefrompng($target_asli);
+                imagealphablending($thumb, false);
+                imagesavealpha($thumb, true);
+                imagecopyresampled($thumb, $source_image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                imagepng($thumb, $target_thumb); 
+            } else {
+                $source_image = imagecreatefromjpeg($target_asli);
+                imagecopyresampled($thumb, $source_image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                imagejpeg($thumb, $target_thumb, 80); 
+            }
+
+            // Bersihkan memori server
+            imagedestroy($thumb);
+            imagedestroy($source_image);
+            
+
+            
+            $stmt = $koneksi->prepare("INSERT INTO inventaris (kode_barang, nama_barang, kategori, merk, jumlah, kondisi, filepath, thumbpath) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            
+            
+            $stmt->bind_param("ssssisss", $kode_barang, $nama_barang, $kategori, $merk, $jumlah, $kondisi, $target_asli, $target_thumb);
+
+            if ($stmt->execute()) {
+                $pesan_sukses = "Data barang berhasil ditambahkan!";
+            } else {
+                $pesan_error = "Gagal menyimpan data: " . $stmt->error;
+            }
+            $stmt->close();
+        } 
+        else {
             $pesan_error = "Ekstensi foto tidak diperbolehkan. Harus JPG, JPEG, atau PNG.";
         }
     }
@@ -116,5 +143,6 @@ if (isset($_POST['simpan'])) {
             <button type="submit" name="simpan" class="btn btn-primary">Simpan Data</button>
         </form>
 
-    </div> </body>
+    </div> 
+</body>
 </html>
